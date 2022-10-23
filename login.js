@@ -11,14 +11,25 @@ async function login() {
             password: formulario.password.value,
         };
 
+        if(user.email == '') {
+            alert('Preencha o campo EMAIL!');
+            return;
+        }
+
+        if(user.password == '') {
+            alert('Preencha o campo SENHA!')
+        }
+
         const result = await api.post("/users/login", user);
+
+        localStorage.setItem('user-id', JSON.stringify(result.data.data))
+
 
         const id = result.data.data;
         console.log(id);
         console.log(result);
         alert("Login realizado com sucesso");
 
-        localStorage.setItem("user-id", id);
         location.href = "home.html";
     } catch (error) {
         console.log(error);

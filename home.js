@@ -14,41 +14,35 @@ window.addEventListener("load", () => {
     listarTasks(id);
 });
 
-async function listarTasks(id) {
+async function listarTasks(userId) {
     try {
-        const id = localStorage.getItem("user-id");
-        const result = await api.get(`/users/${id}/tasks`);
-        console.log(id);
-        console.log(result);
 
+        const user = JSON.parse(localStorage.getItem("user-id"));
+        userId = user.id
 
-        const tabela = document.getElementById("table-body");
-        if (!tabela) {
+        const tabelTasks = document.getElementById("tabelabody");
+
+        if(!tabelTasks){
+            console.error("Tabela não existe");
             return;
         }
+    
+        tabelTasks.innerHTML = "";
+        
+        const result = await api.get(`/users/${userId}`);
+        console.log(result.data.data);
+    
+            for(let item of result.data.data) {
+                tabela.innerHTML += `<tr> <td>${item.title}</td> <td>${item.description}</td>`
+            }
 
-        tabela.innerHTML = "";
+        let cont = 1
 
-        for (let item of result.data.data) {
-            // garantir que o item.id exista
-
-            const oncl = `editarTask('${item.id}')`;
-
-            tabela.innerHTML += `
-                <tr>
-                    <td>${item.title}</td>
-                    <td>${item.description}</td>
-                    <td>
-                        <button onclick="${oncl}">Editar</button>
-                        <button>Deletar</button>
-                    </td>
-                </tr>
-            `;
-        }
+            cont++     
+       
     } catch (error) {
         console.log(error);
     }
-}
 
 async function criarTask() {
         const formulario = document.getElementById("titulo");
@@ -97,6 +91,64 @@ async function criarTask() {
         }
     });
 
-async function editarTask(transactionId) {
-    alert(transactionId);
+async function createTasks() {
+
+    const user = document.getElementById("user-id");
+    const userId = user.id
+
+    const inputTitle = document.getElementById("title");
+    const inputDescription = document.getElementById("description");
+
+    const formRegisterTask = document.getElementById('cadastro-task');
+
+    const buttonCadastrar = document.getElementById("button-cadastrar");
+
+
+    if(inputTitle.value == '')  {
+        alert('Preencha o campo TITULO!');
+        return;
+    }
+
+    if(inputDescription.value == '') {
+        alert('Preencha o campo DESCRIÇÃO!')
+    }
+
+    if(!formRegisterTask) {
+        console.error("Não tem formulário!");
+        return;
+    }
+
+    if(!userId) {
+        alert('Usuário não encontrado!')
+        return;
+    }
+
+    const task = {
+        title: formRegisterTask.title.value,
+        description: formRegisterTask.description.value,
+    }
+
+    try{
+        const result = await api.post(`/users/${userId}`, user);
+
+        inputTitle.value = "";
+        inputDescription.value = "";
+
+        //axios retorna status e data
+        if(result.status != 201) {
+            alert("Erro ao criar Tarefa");
+            console.log(result.response.data.message);
+            return;
+        }
+
+        alert("Tarefa criada com sucesso!");
+        listarTasks();
+    } catch (error){
+        console.log(error);
+    }
+
+    buttonCadastrar.addEventListener('click', createTasks)
+}
+
+
 }

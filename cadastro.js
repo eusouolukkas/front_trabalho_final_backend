@@ -18,11 +18,11 @@ async function listarUsers() {
       console.log(result.data.data);
 
       for(let item of result.data.data) {
-          tabela.innerHTML += `<tr> <td>${item._name}</td> <td>${item._email}</td> </td>`
+          tabela.innerHTML += `<tr> <td>${item.name}</td> <td>${item.email}</td> </td>`
       }
 
   }catch (error) {
-      console.log("Deu ruim");
+      console.log("erro........");
       console.log(error);
   }
 }
@@ -47,15 +47,17 @@ async function cadastrarUser() {
 
       //axios retorna status e data
       if(result.status != 201) {
-          alert("Erro ao criar usuário");
+          alert("Erro ao cadastrar usuário");
           console.log(result.response.data.message);
           return;
       }
 
-      alert("Usuário criado com sucesso!");
+      alert("Usuário cadastrado com sucesso!");
       listarUsers();
+      location.href = "login.html"
   } catch (error){
-      console.log(error.response.data.message);
+    alert(error.response.data.message)
+      console.log(error);
   }
 }
 
